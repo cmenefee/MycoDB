@@ -1,0 +1,140 @@
+---
+title: "pinaceae & salicaceae"
+output: html_notebook
+---
+
+Got some mycorhyzel data....
+  - https://www.nature.com/articles/sdata201628
+  - https://datadryad.org/stash/dataset/doi:10.5061/dryad.723m1
+  
+Abstract:
+Plants form belowground associations with mycorrhizal fungi in one of the most common symbioses on Earth. However, few large-scale generalizations exist for the structure and function of mycorrhizal symbioses, as the nature of this relationship varies from mutualistic to parasitic and is largely context-dependent. We announce the public release of MycoDB, a database of 4,010 studies (from 438 unique publications) to aid in multi-factor meta-analyses elucidating the ecological and evolutionary context in which mycorrhizal fungi alter plant productivity. Over 10 years with nearly 80 collaborators, we compiled data on the response of plant biomass to mycorrhizal fungal inoculation, including meta-analysis metrics and 24 additional explanatory variables that describe the biotic and abiotic context of each study. We also include phylogenetic trees for all plants and fungi in the database. To our knowledge, MycoDB is the largest ecological meta-analysis database. We aim to share these data to highlight significant gaps in mycorrhizal research and encourage synthesis to explore the ecological and evolutionary generalities that govern mycorrhizal functioning in ecosystems. 
+
+
+Which I've stuffed into a database.
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+# install.packages("igraph")
+# install.packages("rworldmap")
+# install.packages("maps")
+# install.packages("ggplot2")
+# install.packages("tidyverse")
+# install.packages("sf")
+# install.packages("mapview")
+# install.packages("dplyr")
+library("RPostgreSQL")
+library("compare")
+library("igraph")
+library("maps")
+library("ggplot2")
+library("rworldmap")
+library("tidyverse")
+library("sf")
+library("mapview")
+library("dplyr")
+
+# Load the PostgreSQL driver, create a connection to the postgres database, and employ it.
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+
+#Set the working directory for files.
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+```
+
+So let's look at the relationships between the plant families pinaceae & salicaceae
+
+Where are pinaceae found?
+```{r}
+planyfamily0 <- subset(MycoDB, MycoDB$plantfamily == "pinaceae")
+planyfamily1 <- subset(planyfamily0, complete.cases(planyfamily0$plant_lat) == TRUE)
+planyfamily2 <- subset(planyfamily1, complete.cases(planyfamily1$plant_long) == TRUE) 
+
+mapview(data.frame(lat = as.numeric(planyfamily2$plant_lat), 
+                     lon = as.numeric(planyfamily2$plant_long),
+                     plantfamily = planyfamily2$plantfamily,
+                     mycorrhizae = planyfamily2$mycorrhizaetype, 
+                     fungalgenus = planyfamily2$fungalgenus,
+                     plantspecies = planyfamily2$plantspecies,
+                     experimentid = planyfamily2$experimentid,
+                     domesticated = planyfamily2$domesticated), 
+                     xcol="lon", ycol="lat", grid = FALSE, crs = 4269)
+```
+
+Where are pinaceae found?
+```{r}
+planyfamily0 <- subset(MycoDB, MycoDB$plantfamily == "salicaceae")
+planyfamily1 <- subset(planyfamily0, complete.cases(planyfamily0$plant_lat) == TRUE)
+planyfamily2 <- subset(planyfamily1, complete.cases(planyfamily1$plant_long) == TRUE) 
+
+mapview(data.frame(lat = as.numeric(planyfamily2$plant_lat), 
+                     lon = as.numeric(planyfamily2$plant_long),
+                     plantfamily = planyfamily2$plantfamily,
+                     mycorrhizae = planyfamily2$mycorrhizaetype, 
+                     fungalgenus = planyfamily2$fungalgenus,
+                     plantspecies = planyfamily2$plantspecies,
+                     experimentid = planyfamily2$experimentid,
+                     domesticated = planyfamily2$domesticated), 
+                     xcol="lon", ycol="lat", grid = FALSE, crs = 4269)
+```
+
+Together
+Where are pinaceae found?
+```{r}
+pineplantfamily0 <- subset(MycoDB, MycoDB$plantfamily == "pinaceae")
+pineplantfamily1 <- subset(pineplantfamily0, complete.cases(pineplantfamily0$plant_lat) == TRUE)
+pineplantfamily2 <- subset(pineplantfamily1, complete.cases(pineplantfamily1$plant_long) == TRUE) 
+pine <- mapview(data.frame(lat = as.numeric(pineplantfamily2$plant_lat), 
+                     lon = as.numeric(pineplantfamily2$plant_long),
+                     plantfamily = pineplantfamily2$plantfamily,
+                     mycorrhizae = pineplantfamily2$mycorrhizaetype, 
+                     fungalgenus = pineplantfamily2$fungalgenus,
+                     plantspecies = pineplantfamily2$plantspecies,
+                     experimentid = pineplantfamily2$experimentid,
+                     domesticated = pineplantfamily2$domesticated),
+                     col.regions=list("green"), col=list("green"),
+                     xcol="lon", ycol="lat", grid = FALSE, crs = 4269)
+
+aspenplantfamily0 <- subset(MycoDB, MycoDB$plantfamily == "salicaceae")
+aspenplantfamily1 <- subset(aspenplantfamily0, complete.cases(aspenplantfamily0$plant_lat) == TRUE)
+aspenplantfamily2 <- subset(aspenplantfamily1, complete.cases(aspenplantfamily1$plant_long) == TRUE) 
+aspen <- mapview(data.frame(lat = as.numeric(aspenplantfamily2$plant_lat), 
+                     lon = as.numeric(aspenplantfamily2$plant_long),
+                     plantfamily = aspenplantfamily2$plantfamily,
+                     mycorrhizae = aspenplantfamily2$mycorrhizaetype, 
+                     fungalgenus = aspenplantfamily2$fungalgenus,
+                     plantspecies = aspenplantfamily2$plantspecies,
+                     experimentid = aspenplantfamily2$experimentid,
+                     domesticated = aspenplantfamily2$domesticated),
+                     col.regions=list("yellow"), col=list("yellow"),
+                     xcol="lon", ycol="lat", grid = FALSE, crs = 4269)
+
+pine + aspen
+```
+
+
+
+Not a whole lotta representations. Do they by chance share any fungi?
+```{r}
+workingsubset <- subset(MycoDB, ! is.na(MycoDB$plantfamily))
+plantsubset <- subset(workingsubset, ! is.na(MycoDB$plantfamily))
+plantea <- subset(plantsubset, ! is.na(plantsubset$plantfamily))
+
+plants <- subset(plantea, plantea$plantfamily == "pinaceae" | plantea$plantfamily == "salicaceae" )
+fungus <- subset(plants, ! is.na(plants$fungalgenus))
+
+g3 <- graph(edges = c(rbind(plants$plantfamily, fungus$fungalgenus)), directed = F)
+# g4 <- simplify(g3, remove.multiple = TRUE, remove.loops = FALSE)
+# plot(g4, vertex.size=2)
+
+dev.new(width = 1000, height = 1000, unit = "px")
+plot(g3)
+
+png(paste(FileDirectory, "PinesAspens.jpg", sep = ""), width = 2500, height = 2500)
+plot(g3, vertex.size=2)
+dev.off()
+```
+
+
