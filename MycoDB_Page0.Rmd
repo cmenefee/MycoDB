@@ -1,0 +1,89 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Got some mycorhyzel data....
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+require("RPostgreSQL")
+require("compare")
+
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+```
+
+
+Now let's do some preliminary exploratory analysis of the plants
+```{r}
+print("Column Names")
+print("*************************************************")
+colnames(MycoDB)
+print("Plant Family:")
+print("*************************************************")
+sort(unique(MycoDB$plantfamily))
+print("Plant Species:")
+print("*************************************************")
+sort(unique(MycoDB$plantspecies))
+```
+
+Now let's do some preliminary exploratory analysis of the fungus
+```{r}
+print("Colum Names")
+print("*************************************************")
+colnames(MycoDB)
+
+print("Fungal Genus 2018")
+print("*************************************************")
+sort(unique(MycoDB$fungalgenus2018))
+
+print("Mycorrhizae Type")
+print("*************************************************")
+sort(unique(MycoDB$mycorrhizaetype))
+
+print("Fungal Genus")
+print("*************************************************")
+sort(unique(MycoDB$fungalgenus))
+
+print("Fungal Group")
+print("*************************************************")
+sort(unique(MycoDB$fungroup))
+```
+Mychorrhizae types
+```{r}
+
+table(MycoDB$mycorrhizaetype)
+sort(table(MycoDB$fungalgenus))
+sort(table(MycoDB$plantfamily))
+```
+A quick look at fabaceae
+```{r}
+fabaceae <- subset(MycoDB, MycoDB$plantfamily == "fabaceae")
+table(fabaceae$fungalgenus)
+```
+
+And then pinaceae
+```{r}
+pinaceae <- subset(MycoDB, MycoDB$plantfamily == "pinaceae")
+table(pinaceae$fungalgenus)
+```
+
+What's in the rhizoglomus group of fungi?
+```{r}
+rhizoglomus <- subset(MycoDB, MycoDB$fungalgenus2018 == "rhizoglomus" | MycoDB$fungalgenus == "rhizoglomus")
+sort(table(rhizoglomus$plantspecies))
+```
+
+Let's try one more subset
+```{r}
+
+someset <- subset(MycoDB, MycoDB$fungalgenus)
+
+
+```

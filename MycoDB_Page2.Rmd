@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+ 
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+require("RPostgreSQL")
+require("compare")
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+```
+
+
+
+Which fungi are AM and which are EM?
+```{r}
+mycorrhizaetype_EM <- subset(MycoDB, MycoDB$mycorrhizaetype == "EM")
+EMFungi <- unique(mycorrhizaetype_EM$fungalgenus)
+print("*************************************************EM Group*************************************************")
+paste(EMFungi)
+
+mycorrhizaetype_AM <- subset(MycoDB, MycoDB$mycorrhizaetype == "AM")
+AMFungi <- unique(mycorrhizaetype_AM$fungalgenus)
+print("*************************************************AM Group*************************************************")
+paste(AMFungi)
+```
+Which plants have what fungi?
+```{r}
+mycorrhizaetype_AM <- subset(MycoDB, MycoDB$mycorrhizaetype == "AM")
+AMFungi_Plants <- sort(unique(mycorrhizaetype_AM$plantfamily))
+print("*************************************************AM Group*************************************************")
+print(AMFungi_Plants)
+
+mycorrhizaetype_EM <- subset(MycoDB, MycoDB$mycorrhizaetype == "EM")
+EMFungi_Plants <- sort(unique(mycorrhizaetype_EM$plantfamily))
+print("*************************************************EM Group*************************************************")
+print(EMFungi_Plants)
+```
+
+
+Are there any fungi found on multiple plants?
+```{r}
+matchvector <- match(EMFungi_Plants, AMFungi_Plants)
+for(i in matchvector)
+  {
+    if(! is.na(i))
+      {
+        print(AMFungi_Plants[i])
+      }
+  }
+
+matchvector <- match(AMFungi_Plants, EMFungi_Plants)
+for(i in matchvector)
+  {
+    if(! is.na(i))
+      {
+        print(AMFungi_Plants[i])
+      }
+  }
+```
+
+What are the effects that having mychorhiza?
+

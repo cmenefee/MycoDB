@@ -1,0 +1,148 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Let's look at network graphs
+
+```{r}
+# install.packages("igraph")
+
+## Load packages
+require("igraph")
+
+g3 <- graph( edges=c("cheese","Pizza", "cheese","hamburger", "cheese","fries", "Pizza","pepperoni", "Pizza","hamburger"), directed = F)
+
+plot(g3) # A simple plot of the network - we'll talk more about plots later
+```
+
+
+```{r}
+require("igraph")
+
+
+g3 <- graph( edges=c(c("cheese","fries"),c("cheese","pizza"),c("cheese","burger")), directed = F)
+plot(g3)
+```
+
+
+connect to the DB
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+require("RPostgreSQL")
+require("compare")
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+```
+
+Let's make a sample and then see what arbitrary connections look like
+```{r}
+print("Plants**************************************************")
+plantsample<-sample(unique(MycoDB$plantfamily), size = 10)
+plantsample
+
+print("Fungi**************************************************")
+fungisample<-sample(unique(MycoDB$fungalgenus), size = 10)
+fungisample
+```
+Now let's hand code some examples?
+```{r}
+require("igraph")
+
+g3 <- graph( edges=c(c("hydnum","apiaceae",
+                       "hydnum","cyperaceae", 
+                       "hydnum","urticaceae", 
+                       "hydnum","liliaceae"),
+                     c("gummiglobus","cyperaceae"),
+                     "gummiglobus","arecaceae",
+                     "gummiglobus","erythroxylaceae",
+                     "gummiglobus","anacardiaceae"), directed = F)
+plot(g3)
+```
+
+One more 'gin
+```{r}
+print("Plants**************************************************")
+plantsample<-sample(unique(MycoDB$plantfamily), size = 20)
+plantsample
+
+print("Fungi**************************************************")
+fungisample<-sample(unique(MycoDB$fungalgenus), size = 10)
+fungisample
+```
+
+
+```{r}
+require("igraph")
+
+g3 <- graph( edges=c(c("russula","apiaceae",
+                       "russula","cyperaceae", 
+                       "russula","urticaceae", 
+                       "russula","liliaceae"),
+                       c("hebeloma","apiaceae",
+                       "hebeloma","cyperaceae", 
+                       "hebeloma","urticaceae", 
+                       "hebeloma","arecaceae"),
+                     c("gummiglobus","cyperaceae"),
+                     "gummiglobus","arecaceae",
+                     "gummiglobus","erythroxylaceae",
+                     "gummiglobus","anacardiaceae"), directed = F)
+plot(g3)
+```
+
+Let's try and take an IRL cut
+```{r}
+# g3 <- graph(edges=c(unique(subset(MycoDB$fungalgenus, MycoDB$fungalgenus != NA)), MycoDB$plantfamily), directed = F)
+# FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+# png(paste(FileDirectory, "FungiFamilyLarge.jpg", sep = ""), width = 10000, height = 10000)
+# plot(g3)
+# dev.off
+```
+
+So that's an unholy mess. Let's take a sample and try.
+```{r}
+# sampleset <- sample(MycoDB, size = 1000, replace = TRUE)
+# sampleset
+
+fungisubset <- subset(MycoDB, ! is.na(MycoDB$fungalgenus))
+
+fungivector <- fungisubset[,'fungalgenus']
+plantvector <- fungisubset[,'plantfamily']
+
+g3 <- graph(edge = c(fungivector, plantvector), directed = F)
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+png(paste(FileDirectory, "FungiFamilyLarge.jpg", sep = ""), width = 5000, height = 5000)
+plot(g3, vertex.size=1)
+dev.off()
+
+```
+
+That's it but it looks wrong....Let's try one more time....
+```{r}
+fungalsubset <- subset(MycoDB, ! is.na(MycoDB$fungalgenus))
+rhizoglomus <- subset(fungalsubset, fungalsubset$fungalgenus == "rhizoglomus")
+networkmap <- graph(edge = c(rhizoglomus$fungalgenus, rhizoglomus$plantfamily))
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+png(paste(FileDirectory, "rhizoglomus.jpg", sep = ""), width = 5000, height = 5000)
+plot(networkmap, vertex.size=1)
+dev.off()
+```
+
+Still not right.
+Some how we ned to create this structure
+g3 <- graph( edges=c(c("hydnum","apiaceae",
+                       "hydnum","cyperaceae", 
+                       "hydnum","urticaceae", 
+                       "hydnum","liliaceae"),
+                     c("gummiglobus","cyperaceae"),
+                     "gummiglobus","arecaceae",
+                     "gummiglobus","erythroxylaceae",
+                     "gummiglobus","anacardiaceae"), directed = F)
+                     
+And have it work through....
+

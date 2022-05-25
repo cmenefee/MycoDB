@@ -1,0 +1,72 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+require("RPostgreSQL")
+require("compare")
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+  
+```
+
+
+Let's graph the plants things.....
+```{r}
+png(paste(FileDirectory, "PlantFamily.jpg", sep = ""), width = 1500, height = 500)
+par(mar = c(10, 5, 5, 5))
+plot(table(MycoDB$plantfamily), las = 2, cex.axis = 1, main = "")
+dev.off()
+
+plot(table(MycoDB$plantfamily), las = 2, cex.axis = 1, main = "")
+
+```
+
+And now the fungi
+```{r}
+png(paste(FileDirectory, "FungiFamily.jpg", sep = ""), width = 1500, height = 500)
+par(mar = c(10, 5, 5, 5))
+plot(table(MycoDB$fungalgenus), las = 2, cex.axis = 1, main = "")
+dev.off()
+
+plot(table(MycoDB$fungalgenus), las = 2, cex.axis = 1, main = "")
+```
+How about EM or AM?
+```{r}
+plot(table(MycoDB$mycorrhizaetype))
+
+mycorrhizaetype_AM <- subset(MycoDB, MycoDB$mycorrhizaetype == "AM")
+mycorrhizaetype_AM <- subset(MycoDB, MycoDB$mycorrhizaetype == "EM")
+
+```
+
+Let's look at Rhizoglomus
+```{r}
+png(paste(FileDirectory, "rhizoglomus.jpg", sep = ""), width = 2500, height = 500)
+par(mar = c(20, 5, 5, 5))
+rhizoglomus <- subset(MycoDB, MycoDB$fungalgenus2018 == "rhizoglomus" | MycoDB$fungalgenus == "rhizoglomus")
+plot(table(rhizoglomus$plantspecies), las = 2, cex.axis = 1, main = "")
+dev.off()
+
+par(mar = c(10, 5, 5, 5))
+plot(table(rhizoglomus$plantspecies), las = 2, cex.axis = 1, main = "")
+```
+
+
+
+
+Nice. But what are some questions we can ask?
+```{r}
+
+
+```
+

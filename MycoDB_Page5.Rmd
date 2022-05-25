@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+https://map-rfun.library.duke.edu/01_georeference.html
+ 
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+# install.packages("igraph")
+# install.packages("rworldmap")
+# install.packages("maps")
+# install.packages("ggplot2")
+# install.packages("tidyverse")
+# install.packages("sf")
+# install.packages("mapview")
+# install.packages("dplyr")
+library("RPostgreSQL")
+library("compare")
+library("igraph")
+library("maps")
+library("ggplot2")
+library("rworldmap")
+library("tidyverse")
+library("sf")
+library("mapview")
+library("dplyr")
+
+# Load the PostgreSQL driver, create a connection to the postgres database, and employ it.
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+
+#Set the working directory for files.
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+```
+
+Let's map it all.
+```{r}
+# get map
+worldmap <- getMap(resolution = "coarse")
+# plot world map
+plot(worldmap, col = "lightgrey", fill = T, border = "darkgray", xlim = c(-180, 180), ylim = c(-90, 90), bg = "aliceblue", asp = 1, wrap=c(-180,180))
+```
+
+```{r}
+starbucks <- read.csv("https://raw.githubusercontent.com/libjohn/mapping-with-R/master/data/All_Starbucks_Locations_in_the_US_-_Map.csv")
+starbucksNC <- starbucks
+starbucksNC
+mapview(starbucksNC, xcol = "Longitude", ycol = "Latitude", crs = 4269, grid = FALSE)
+```
+Now let's test it with our own data. 
+Make sure mapview doesn't get any NA or non numeric characters for xcol or ycol...haha....don't do it.
+```{r}
+
+twofungi <- sort(unique(MycoDB$fungalgenus))
+
+for(i in twofungi)
+  {
+    suillus <-  subset(MycoDB, MycoDB$fungalgenus == i)
+    suillus1 <- subset(suillus, is.na(suillus$fung_lat) == FALSE)
+    suillus2 <- subset(suillus1, is.na(suillus1$fung_long) == FALSE) 
+    
+
+      toview <-  try(mapview(data.frame(lat = as.numeric(suillus2$fung_lat), 
+                           lon = as.numeric(suillus2$fung_long), 
+                           mycorrhizae = suillus2$mycorrhizaetype, 
+                           fungalgenus = suillus2$fungalgenus,
+                           plantfamily = suillus2$plantfamily,
+                           plantspecies = suillus2$plantspecies,
+                           experimentid = suillus2$experimentid,
+                           domesticated = suillus2$domesticated), 
+                           xcol="lon", ycol="lat", grid = FALSE, crs = 4269))
+      print(toview)
+  }
+```
+
+
+
+
+Scraps
+```{r}
+
+# chords <- rbind(lat = as.numeric(suillus1$fung_lat), lon = as.numeric(suillus1$fung_lon))
+
+# chords <- 
+
+# typeof(chords[,1])
+# chords[,2]
+
+# mapview(suillus1, cbind(lat = as.numeric(suillus1$fung_lat), lon = as.numeric(suillus1$fung_lon)), xcol="lon", ycol="lat", grid = FALSE, crs = NA)
+mapview(data.frame( lat = suillus1$fung_lat, lon = suillus1$fung_lon), xcol="lon", ycol="lat", grid = FALSE, crs = NA)
+# mapview(chords, xcol="lon", ycol="lat", grid = FALSE, crs = NA)
+# mapview(suillus1, xcol=chords[,2], ycol=chords[,1], grid = FALSE, crs = NA)
+
+
+# Neat piping
+# starbucksNC <- starbucks  %>% 
+#   filter(starbucks$State == "AZ")
+# 
+# starbucksNC %>% glimpse()
+```

@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+ 
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+# install.packages("igraph")
+require("RPostgreSQL")
+require("compare")
+require("igraph")
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "mycodb", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM mycodb", sep="")
+MycoDB <- data.frame(dbGetQuery(con, sql_string))
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/MycoDB/Graphics/", sep="")
+```
+
+Some how we need to programatically create the following structure:
+```{r}
+#how to programatically create this structure:
+g1 <- graph( edges=c(c("russula","apiaceae",
+                       "russula","cyperaceae", 
+                       "russula","urticaceae", 
+                       "russula","liliaceae"),
+                       c("hebeloma","apiaceae",
+                       "hebeloma","cyperaceae", 
+                       "hebeloma","urticaceae", 
+                       "hebeloma","arecaceae"),
+                     c("gummiglobus","cyperaceae"),
+                     "gummiglobus","arecaceae",
+                     "gummiglobus","erythroxylaceae",
+                     "gummiglobus","anacardiaceae"), directed = F)
+plot(g1)
+```
+
+Just one fungi
+```{r}
+#First a nice clean subset:
+workingsubset <- subset(MycoDB, ! is.na(MycoDB$plantfamily))
+fungalsubset <- subset(workingsubset, ! is.na(MycoDB$fungalgenus))
+
+rhizoglomus <- subset(fungalsubset, fungalsubset$fungalgenus == "rhizoglomus")
+fungus <- rhizoglomus$fungalgenus
+
+g3 <- graph(edge = c(c(rbind(fungus,unique(rhizoglomus$plantfamily)))), directed = F)
+g4 <- simplify(g3, remove.multiple = T, remove.loops = F)
+
+png(paste(FileDirectory, "rhizoglomus.jpg", sep = ""), width = 1000, height = 1000)
+plot(g4, vertex.size=5)
+dev.off()
+```
+
+
+All the fungi
+```{r}
+#First a nice clean subset:
+workingsubset <- subset(MycoDB, ! is.na(MycoDB$plantfamily))
+fungalsubset1 <- subset(workingsubset, ! is.na(MycoDB$fungalgenus))
+fungalsubset2 <- subset(fungalsubset1, fungalsubset1$mycorrhizaetype == "EM")
+fungalsubset3 <- subset(fungalsubset1, fungalsubset1$fungroup == "nonNwood") # "C3grass"  "C4grass"  "Nfixforb" "Nfixwood" "nonNforb" "nonNwood"
+fungalsubset4 <- subset(fungalsubset1, fungalsubset1$experimentid == "487")
+length(unique(fungalsubset1$experimentid))
+
+fungus <- fungalsubset2$fungalgenus
+
+ g3 <- graph(edge = c(c(rbind(fungus,unique(fungalsubset4$plantfamily)))), directed = F)
+ g4 <- simplify(g3, remove.multiple = TRUE, remove.loops = TRUE)
+
+plot(g3, vertex.size=2)
+
+png(paste(FileDirectory, "mycorrhizaetypeEM.jpg", sep = ""), width = 10000, height = 10000)
+plot(g3, vertex.size=2)
+dev.off()
+```
