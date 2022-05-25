@@ -1,10 +1,13 @@
+A look at the following database...
+output files at http://kinokomori.info/MycoDB/
+
 Title: MycoDB, a global database of plant response to mycorrhizal fungi
 Contact: bala.chaudhary@depaul.edu
 =====================================================================================
 MycoDB Version 1 published April 22, 2016
 
 See original publication, specifically Table 1, for full meta-data and description of variables:
-Chaudhary VB, Rúa MA, Antoninka A, Bever JD, Cannon J, Craig A, Duchicela J, Frame A, Gardes M, Gehring C, Ha M, Hart M, Hopkins J, Ji B, Johnson NC, Kaonongbua W, Karst J, Koide RT, Lamit LJ, Meadow J, Milligan BG, Moore JC, Pendergast IV TH, Piculell B, Ramsby B, Simard S, Shrestha S, Umbanhowar J, Viechtbauer W, Walters L, Wilson GWT, Zee PC, Hoeksema JD (2016) MycoDB, a global database of plant response to mycorrhizal fungi. Scientific Data 3: 160028. https://doi.org/10.1038/sdata.2016.28
+Chaudhary VB, RÃºa MA, Antoninka A, Bever JD, Cannon J, Craig A, Duchicela J, Frame A, Gardes M, Gehring C, Ha M, Hart M, Hopkins J, Ji B, Johnson NC, Kaonongbua W, Karst J, Koide RT, Lamit LJ, Meadow J, Milligan BG, Moore JC, Pendergast IV TH, Piculell B, Ramsby B, Simard S, Shrestha S, Umbanhowar J, Viechtbauer W, Walters L, Wilson GWT, Zee PC, Hoeksema JD (2016) MycoDB, a global database of plant response to mycorrhizal fungi. Scientific Data 3: 160028. https://doi.org/10.1038/sdata.2016.28
 
 Associated files FungalTree_version1 and PlantTree_version1 can be used to conduct phylogenetic meta-analyses with MycoDB_version1.
 
@@ -28,7 +31,7 @@ MycoDB Version 3 published November 3, 2017
 
 MycoDB Version 4 published July 10, 2018
 
-* One new variable (column) entitled Karst2018 was added to version 4 in association with the publication by Karst et al. 2018. This column indicates with a yes which studies were used in Karst J, Burns C, Cale JC, Antunes PM, Woods M, Lamit LJ, Hoeksema JD, Zabinski C, Gehring CA, La Flèche M, Rúa M. 2018. Tree species with limited geographic ranges show extreme responses to ectomycorrhizas. Global Ecology and Biogeography. 
+* One new variable (column) entitled Karst2018 was added to version 4 in association with the publication by Karst et al. 2018. This column indicates with a yes which studies were used in Karst J, Burns C, Cale JC, Antunes PM, Woods M, Lamit LJ, Hoeksema JD, Zabinski C, Gehring CA, La FlÃ¨che M, RÃºa M. 2018. Tree species with limited geographic ranges show extreme responses to ectomycorrhizas. Global Ecology and Biogeography. 
 * Five new variables (columns) were added to version 4 in associated with the publication by Hoeksema et al. 2018. Evolutionary history predicts the strength of mycorrhizal mutualism Communications Biology:
 o "PlantSpecies2018" = Plant species names used in the analyses by Hoeksema et al. (2018). These names include 2 genus spelling corrections (Cytharexylum changed to Citharexylum and Macherium changed to Machaerium). Compared to PlantSpeciesMar2017, it additionally includes names for arbuscular mycorrhizal (AM) plants, but does not include a small number of taxonomy updates incorporated into PlantSpeciesMar2017 (Afzelia changed to Intsia, Uapaca somon changed to Uapaca togoensis, Hopea helferi changed to Vatica helferi, Shorea seminis changed to Hopea seminis, and Salix dasyclados changed to Salix gmelinii), in order to maintain compatibility with the companion plant phylogeny published with MycoDB Version 4. Those taxonomy updates will be included in any future versions of the database and companion plant phylogeny.
 o "FungalGenus2018" = Fungal genus names used in the analyses by Hoeksema et al. (2018), updated based on recent taxonomic studies.
