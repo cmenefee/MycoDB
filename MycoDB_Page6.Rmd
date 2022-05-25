@@ -63,7 +63,7 @@ mapview(data.frame(lat = as.numeric(planyfamily2$plant_lat),
                      xcol="lon", ycol="lat", grid = FALSE, crs = 4269)
 ```
 
-Where are pinaceae found?
+Where are salicaceae found?
 ```{r}
 planyfamily0 <- subset(MycoDB, MycoDB$plantfamily == "salicaceae")
 planyfamily1 <- subset(planyfamily0, complete.cases(planyfamily0$plant_lat) == TRUE)
